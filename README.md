@@ -27,7 +27,7 @@ that modern computers are plenty fast enough for the best of both worlds.
 
 Here is what it ends up looking like:
 
-![Screenshot](https://raw.githubusercontent.com/mitchellh/nixos-config/main/.github/images/screenshot.png)
+![Screenshot](.github/images/screenshot.png)
 
 Note that I usually full screen the VM so there isn't actually a window,
 and I three-finger swipe or use other keyboard shortcuts to active that
@@ -57,8 +57,8 @@ hypervisors) support 3D acceleration on macOS and I get really smooth
 rendering because of it.
 
 **This can't actually work! This only works on a powerful workstation!**
-I've been doing this since late 2020, and I've developed
-[a lot of very real software](https://www.hashicorp.com/). It works for me.
+I've been doing this since late 2020, and I've shipped a lot of production
+software using this setup. It works for me.
 I also use this VM on a MacBook Pro (to be fair, it is maxed out on specs),
 and I have no issues whatsoever.
 
@@ -71,8 +71,6 @@ using an Apple Silicon Mac full time since Nov 2021 with this setup.
 Hyper-V and VMware Workstation Pro and it works great in either case.
 
 ## Setup (VM)
-
-Video: <https://www.youtube.com/watch?v=ubDMLoWz76U>
 
 **Note:** This setup guide will cover VMware Fusion because that is the
 hypervisor I use day to day. Others have reported getting my configurations

@@ -74,21 +74,13 @@ in {
     pkgs.tree
     pkgs.watch
 
-    pkgs.gopls
-    pkgs.zigpkgs."0.14.0"
-
-    pkgs.claude-code
-    pkgs.codex
-
     # Node is required for Copilot.vim
     pkgs.nodejs
   ] ++ (lib.optionals isDarwin [
     # This is automatically setup on Linux
-    pkgs.cachix
     pkgs.tailscale
   ]) ++ (lib.optionals (isLinux && !isWSL) [
     pkgs.chromium
-    pkgs.firefox
     pkgs.rofi
     pkgs.valgrind
     pkgs.zathura
@@ -149,8 +141,7 @@ in {
     config = {
       whitelist = {
         prefix= [
-          "$HOME/code/go/src/github.com/hashicorp"
-          "$HOME/code/go/src/github.com/mitchellh"
+          "$HOME/code/go/src/github.com/ahmed"
         ];
 
         exact = ["$HOME/.envrc"];
@@ -186,13 +177,13 @@ in {
       signByDefault = true;
     };
     settings = {
-      user.name = "Mitchell Hashimoto";
-      user.email = "m@mitchellh.com";
+      user.name = "Ahmed Javed";
+      user.email = "ahmedjaved701@gmail.com";
       branch.autosetuprebase = "always";
       color.ui = true;
       core.askPass = ""; # needs to be empty to use terminal for ask pass
       credential.helper = "store"; # want to make this more secure
-      github.user = "mitchellh";
+      github.user = "veonim";
       push.default = "tracking";
       init.defaultBranch = "main";
       aliases = {
@@ -207,7 +198,7 @@ in {
     enable = true;
     env = { 
       GOPATH = "Documents/go";
-      GOPRIVATE = [ "github.com/mitchellh" ];
+      GOPRIVATE = [ "github.com/veonim" ];
     };
   };
 

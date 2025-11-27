@@ -1,17 +1,21 @@
 # Connectivity info for Linux VM
-NIXADDR ?= unset
+NIXADDR ?= 192.168.10.20
 NIXPORT ?= 22
-NIXUSER ?= mitchellh
+NIXUSER ?= ahmed
 
 # Get the path to this Makefile and directory
 MAKEFILE_DIR := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
 
 # The name of the nixosConfiguration in the flake
-NIXNAME ?= vm-intel
+NIXNAME ?= vm-aarch64
 
 # SSH options that are used. These aren't meant to be overridden but are
-# reused a lot so we just store them up here.
-SSH_OPTIONS=-o PubkeyAuthentication=no -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+# reused a lot so we just store them up here. We keep base options for both
+# password and pubkey flows since bootstrap starts with password auth and
+# the final system uses keys.
+SSH_BASE_OPTIONS=-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+SSH_PASSWORD_OPTIONS=$(SSH_BASE_OPTIONS) -o PubkeyAuthentication=no
+SSH_OPTIONS ?= $(SSH_BASE_OPTIONS)
 
 # We need to do some OS switching below.
 UNAME := $(shell uname)
@@ -38,7 +42,7 @@ endif
 cache:
 	nix build '.#nixosConfigurations.$(NIXNAME).config.system.build.toplevel' --json \
 		| jq -r '.[].outputs | to_entries[].value' \
-		| cachix push mitchellh-nixos-config
+		| cachix push ahmed-nixos-config
 
 # Backup secrets so that we can transer them to new machines via
 # sneakernet or other means.
@@ -71,19 +75,19 @@ secrets/restore:
 # NixOS. After installing NixOS, you must reboot and set the root password
 # for the next step.
 #
-# NOTE(mitchellh): I'm sure there is a way to do this and bootstrap all
+# NOTE: I'm sure there is a way to do this and bootstrap all
 # in one step but when I tried to merge them I got errors. One day.
 vm/bootstrap0:
-	ssh $(SSH_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
-		parted /dev/sda -- mklabel gpt; \
-		parted /dev/sda -- mkpart primary 512MB -8GB; \
-		parted /dev/sda -- mkpart primary linux-swap -8GB 100\%; \
-		parted /dev/sda -- mkpart ESP fat32 1MB 512MB; \
-		parted /dev/sda -- set 3 esp on; \
+	ssh $(SSH_PASSWORD_OPTIONS) -p$(NIXPORT) root@$(NIXADDR) " \
+		parted /dev/nvme0n1 -- mklabel gpt; \
+		parted /dev/nvme0n1 -- mkpart primary 512MB -8GB; \
+		parted /dev/nvme0n1 -- mkpart primary linux-swap -8GB 100\%; \
+		parted /dev/nvme0n1 -- mkpart ESP fat32 1MB 512MB; \
+		parted /dev/nvme0n1 -- set 3 esp on; \
 		sleep 1; \
-		mkfs.ext4 -L nixos /dev/sda1; \
-		mkswap -L swap /dev/sda2; \
-		mkfs.fat -F 32 -n boot /dev/sda3; \
+		mkfs.ext4 -L nixos /dev/nvme0n1p1; \
+		mkswap -L swap /dev/nvme0n1p2; \
+		mkfs.fat -F 32 -n boot /dev/nvme0n1p3; \
 		sleep 1; \
 		mount /dev/disk/by-label/nixos /mnt; \
 		mkdir -p /mnt/boot; \
@@ -92,12 +96,10 @@ vm/bootstrap0:
 		sed --in-place '/system\.stateVersion = .*/a \
 			nix.package = pkgs.nixVersions.latest;\n \
 			nix.extraOptions = \"experimental-features = nix-command flakes\";\n \
-			nix.settings.substituters = [\"https://mitchellh-nixos-config.cachix.org\"];\n \
-			nix.settings.trusted-public-keys = [\"mitchellh-nixos-config.cachix.org-1:bjEbXJyLrL1HZZHBbO4QALnI5faYZppzkU4D2s0G8RQ=\"];\n \
   			services.openssh.enable = true;\n \
 			services.openssh.settings.PasswordAuthentication = true;\n \
 			services.openssh.settings.PermitRootLogin = \"yes\";\n \
-			users.users.root.initialPassword = \"root\";\n \
+			users.users.root.initialPassword = \"1234\";\n \
 		' /mnt/etc/nixos/configuration.nix; \
 		nixos-install --no-root-passwd && reboot; \
 	"
@@ -114,14 +116,8 @@ vm/bootstrap:
 
 # copy our secrets into the VM
 vm/secrets:
-	# GPG keyring
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
-		--exclude='.#*' \
-		--exclude='S.*' \
-		--exclude='*.conf' \
-		$(HOME)/.gnupg/ $(NIXUSER)@$(NIXADDR):~/.gnupg
 	# SSH keys
-	rsync -av -e 'ssh $(SSH_OPTIONS)' \
+	rsync -av -e 'ssh $(SSH_OPTIONS) -p$(NIXPORT)' \
 		--exclude='environment' \
 		$(HOME)/.ssh/ $(NIXUSER)@$(NIXADDR):~/.ssh
 
