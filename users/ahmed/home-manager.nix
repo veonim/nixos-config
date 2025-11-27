@@ -58,7 +58,6 @@ in {
   # per-project flakes sourced with direnv and nix-shell, so this is
   # not a huge list.
   home.packages = [
-    pkgs._1password-cli
     pkgs.asciinema
     pkgs.bat
     pkgs.chezmoi
@@ -69,7 +68,6 @@ in {
     pkgs.htop
     pkgs.jq
     pkgs.ripgrep
-    pkgs.sentry-cli
     pkgs.starship
     pkgs.tree
     pkgs.watch
