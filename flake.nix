@@ -47,7 +47,7 @@
     };
 
     # Other packages
-    jujutsu.url = "github:martinvonz/jj";
+    # jujutsu.url = "github:martinvonz/jj";
 
     # Non-flakes
     theme-bobthefish.url = "github:oh-my-fish/theme-bobthefish/e3b4d4eafc23516e35f162686f08a42edf844e40";
@@ -61,7 +61,7 @@
   outputs = { self, nixpkgs, home-manager, darwin, ... }@inputs: let
     # Overlays is the list of overlays we want to apply from flake inputs.
     overlays = [
-      inputs.jujutsu.overlays.default
+      # inputs.jujutsu.overlays.default
       (final: prev: rec {
         # gh CLI on stable has bugs.
         gh = inputs.nixpkgs-unstable.legacyPackages.${prev.system}.gh;

@@ -1,5 +1,5 @@
 # Connectivity info for Linux VM
-NIXADDR ?= 192.168.10.20
+NIXADDR ?= 192.168.10.28
 NIXPORT ?= 22
 NIXUSER ?= ahmed
 
@@ -136,7 +136,7 @@ vm/copy:
 # have to run vm/copy before.
 vm/switch:
 	ssh $(SSH_OPTIONS) -p$(NIXPORT) $(NIXUSER)@$(NIXADDR) " \
-		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" \
+		sudo NIXPKGS_ALLOW_UNSUPPORTED_SYSTEM=1 nixos-rebuild switch --flake \"/nix-config#${NIXNAME}\" --keep-going; \
 	"
 
 # Build a WSL installer
