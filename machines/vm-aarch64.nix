@@ -8,7 +8,7 @@
   boot.binfmt.emulatedSystems = ["x86_64-linux"];
 
   # Interface is this on M1
-  networking.interfaces.ens160.useDHCP = true;
+  networking.interfaces.enp2s0.useDHCP = true;
 
   # Lots of stuff that uses aarch64 that claims doesn't work, but actually works.
   nixpkgs.config.allowUnfree = true;
@@ -28,6 +28,7 @@
       "allow_other"
       "auto_unmount"
       "defaults"
+      "nofail"
     ];
   };
 }

@@ -112,6 +112,7 @@ in {
   xdg.configFile = {
     "i3/config".text = builtins.readFile ./i3;
     "rofi/config.rasi".text = builtins.readFile ./rofi;
+    "nvim/init.lua".text = builtins.readFile ./init.lua;
   } // (if isDarwin then {
     # Rectangle.app. This has to be imported manually using the app.
     "rectangle/RectangleConfig.json".text = builtins.readFile ./RectangleConfig.json;
@@ -249,6 +250,12 @@ in {
   programs.neovim = {
     enable = true;
     package = inputs.neovim-nightly-overlay.packages.${pkgs.system}.default;
+    
+    # Ensure git and other tools are available for lazy.nvim to install/manage plugins
+    extraPackages = [
+      pkgs.git
+      pkgs.curl  # Some plugins may need curl
+    ];
   };
 
   programs.atuin = {

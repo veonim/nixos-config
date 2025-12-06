@@ -27,6 +27,7 @@
         # display resolution. This is a known issue with VMware Fusion.
         sessionCommands = ''
           ${pkgs.xorg.xset}/bin/xset r rate 200 40
+          ${pkgs.xorg.xrandr}/bin/xrandr --output Virtual-1 --auto
         '';
       };
 
